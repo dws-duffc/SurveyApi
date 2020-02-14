@@ -11,7 +11,7 @@ namespace cduff.Survey.Data.Repositories
     using System.Linq;
     using System.Linq.Expressions;
     using System.Data;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using Model;
     using Utilities;
 
@@ -30,7 +30,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Answer_Delete";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = entity.AnswerId });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
@@ -50,25 +50,25 @@ namespace cduff.Survey.Data.Repositories
         public override IEnumerable<Answer> Find(Expression<Func<Answer, bool>> predicate)
         {
             List<Filter> filters = ExpressionDecompiler<Answer>.Decompile(predicate);
-            var answerId = filters.SingleOrDefault(x => x.PropertyName == "AnswerId");
-            var answerText = filters.SingleOrDefault(x => x.PropertyName == "AnswerText");
-            var answerSort = filters.SingleOrDefault(x => x.PropertyName == "AnswerSort");
-            var questionId = filters.SingleOrDefault(x => x.PropertyName == "QuestionId");
-            var questionType = filters.SingleOrDefault(x => x.PropertyName == "QuestionTypeId");
-            var periodId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
-            var periodStartDate = filters.SingleOrDefault(x => x.PropertyName == "StartDate");
-            var periodEndDate = filters.SingleOrDefault(x => x.PropertyName == "EndDate");
-            var periodIsOpen = filters.SingleOrDefault(x => x.PropertyName == "IsOpen");
-            var questionText = filters.SingleOrDefault(x => x.PropertyName == "QuestionText");
-            var questionSort = filters.SingleOrDefault(x => x.PropertyName == "QuestionSort");
-            var questionDesc = filters.SingleOrDefault(x => x.PropertyName == "Description");
-            var hasAnswers = filters.SingleOrDefault(x => x.PropertyName == "HasAnswers");
+            Filter answerId = filters.SingleOrDefault(x => x.PropertyName == "AnswerId");
+            Filter answerText = filters.SingleOrDefault(x => x.PropertyName == "AnswerText");
+            Filter answerSort = filters.SingleOrDefault(x => x.PropertyName == "AnswerSort");
+            Filter questionId = filters.SingleOrDefault(x => x.PropertyName == "QuestionId");
+            Filter questionType = filters.SingleOrDefault(x => x.PropertyName == "QuestionTypeId");
+            Filter periodId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
+            Filter periodStartDate = filters.SingleOrDefault(x => x.PropertyName == "StartDate");
+            Filter periodEndDate = filters.SingleOrDefault(x => x.PropertyName == "EndDate");
+            Filter periodIsOpen = filters.SingleOrDefault(x => x.PropertyName == "IsOpen");
+            Filter questionText = filters.SingleOrDefault(x => x.PropertyName == "QuestionText");
+            Filter questionSort = filters.SingleOrDefault(x => x.PropertyName == "QuestionSort");
+            Filter questionDesc = filters.SingleOrDefault(x => x.PropertyName == "Description");
+            Filter hasAnswers = filters.SingleOrDefault(x => x.PropertyName == "HasAnswers");
 
             using (IDbCommand command = Context.CreateCommand())
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Answer_Search";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = answerId == null ? DBNull.Value : answerId.Value });
                 command.Parameters.Add(new SqlParameter("@p_AnswerText", SqlDbType.VarChar, 8000) { Value = answerText == null ? DBNull.Value : answerText.Value });
@@ -104,7 +104,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Answer_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = DBNull.Value });
 
@@ -129,16 +129,16 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Answer_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = id.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = id.ToDbNull() });
 
                 using (IDataReader reader = command.ExecuteReader())
                 {
                     IList<Answer> answers = new List<Answer>();
                     while (reader.Read())
                     {
-                        Answer answer = MapEntity(typeof(Answer), reader, true) as Answer;
+                        var answer = MapEntity(typeof(Answer), reader, true) as Answer;
                         answers.Add(answer);
                     }
 
@@ -158,11 +158,11 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Answer_Insert";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_QuestionId", SqlDbType.Int, 3) { Value = entity.QuestionId });
-                command.Parameters.Add(new SqlParameter("@p_Text", SqlDbType.VarChar, 8000) { Value = entity.AnswerText.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_SortOrder", SqlDbType.BigInt, 19) { Value = entity.AnswerSort.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_Text", SqlDbType.VarChar, 8000) { Value = entity.AnswerText.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_SortOrder", SqlDbType.BigInt, 19) { Value = entity.AnswerSort.ToDbNull() });
                 IDbDataParameter answerId = new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(answerId);
 
@@ -183,12 +183,12 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Answer_Update";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = entity.AnswerId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_QuestionId", SqlDbType.Int, 10) { Value = entity.QuestionId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_Text", SqlDbType.VarChar, 8000) { Value = entity.AnswerText.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_SortOrder", SqlDbType.BigInt, 19) { Value = entity.AnswerSort.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_AnswerId", SqlDbType.BigInt, 19) { Value = entity.AnswerId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_QuestionId", SqlDbType.Int, 10) { Value = entity.QuestionId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_Text", SqlDbType.VarChar, 8000) { Value = entity.AnswerText.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_SortOrder", SqlDbType.BigInt, 19) { Value = entity.AnswerSort.ToDbNull() });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(rowCount);
 

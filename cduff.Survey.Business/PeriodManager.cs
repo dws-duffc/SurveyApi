@@ -19,9 +19,9 @@ namespace cduff.Survey.Business
     /// </summary>
     public class PeriodManager : IManager<Period>
     {
-        readonly SurveyContext context;
-        readonly AssignmentRepository assignmentRepo;
-        readonly PeriodRepository periodRepo;
+        private readonly SurveyContext context;
+        private readonly AssignmentRepository assignmentRepo;
+        private readonly PeriodRepository periodRepo;
 
         public PeriodManager(SurveyContext context)
         {
@@ -50,17 +50,16 @@ namespace cduff.Survey.Business
 
             using (IUnitOfWork unitOfWork = context.CreateUnitOfWork())
             {
-                int newPeriodId = 0;
-                newPeriodId = periodRepo.Insert(period);
+                int newPeriodId = periodRepo.Insert(period);
                 if (newPeriodId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Period.", period);
                 }
 
-                if (period.IsOpen == true)
+                if (period.IsOpen)
                 {
-                    var oldPeriod = periodRepo
-                        .Find(x => x.IsOpen == true)
+                    Period oldPeriod = periodRepo
+                        .Find(x => x.IsOpen)
                         .FirstOrDefault(y => y.PeriodId != newPeriodId);
 
                     if (oldPeriod != null)
@@ -164,10 +163,10 @@ namespace cduff.Survey.Business
                     throw new FailedOperationException("Failed to update Period.", period);
                 }
 
-                if (period.IsOpen == true)
+                if (period.IsOpen)
                 {
-                    var oldPeriod = periodRepo
-                        .Find(x => x.IsOpen == true)
+                    Period oldPeriod = periodRepo
+                        .Find(x => x.IsOpen)
                         .FirstOrDefault(y => y.PeriodId != period.PeriodId);
 
                     if (oldPeriod != null)

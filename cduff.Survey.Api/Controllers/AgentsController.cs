@@ -20,13 +20,13 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class AgentsController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<AgentsController> logger;
-        readonly AgentManager agentManager;
-        readonly AssignmentManager assignmentManager;
-        readonly AttemptLogManager attemptLogManager;
-        readonly ContactManager contactManager;
-        readonly ResponseManager responseManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<AgentsController> logger;
+        private readonly AgentManager agentManager;
+        private readonly AssignmentManager assignmentManager;
+        private readonly AttemptLogManager attemptLogManager;
+        private readonly ContactManager contactManager;
+        private readonly ResponseManager responseManager;
 
         public AgentsController(ILogger<AgentsController> logger, IConfiguration config,
             AgentManager agentManager, AssignmentManager assignmentManager,

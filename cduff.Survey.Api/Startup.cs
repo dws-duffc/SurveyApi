@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,8 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-//using Microsoft.AspNetCore.SpaServices.Webpack;
-using Microsoft.AspNetCore.Authorization;
 
 namespace cduff.Survey.Api
 {
@@ -28,12 +23,23 @@ namespace cduff.Survey.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             // Add custom services
             services.AddSurveyConfiguration();
 
             // Add logging
-            services.AddLogging();
+            services.AddLogging(config =>
+            {
+                config.ClearProviders();
+
+                config.AddConfiguration(Configuration.GetSection("Logging"));
+                config.AddDebug();
+                config.AddEventSourceLogger();
+
+                if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == Environments.Development)
+                {
+                    config.AddConsole();
+                }
+            });
 
             // Add authentication/authorization services
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
@@ -66,17 +72,15 @@ namespace cduff.Survey.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //loggerFactory.AddDebug(LogLevel.Information);
             }
             else
             {
                 app.UseExceptionHandler("/Error");
-                //loggerFactory.AddDebug(LogLevel.Error);
             }
 
             app.UseStaticFiles();

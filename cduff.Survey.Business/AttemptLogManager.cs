@@ -19,8 +19,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class AttemptLogManager : IManager<AttemptLog>
     {
-        readonly SurveyContext context;
-        readonly AttemptLogRepository attemptLogRepo;
+        private readonly SurveyContext context;
+        private readonly AttemptLogRepository attemptLogRepo;
 
         public AttemptLogManager(SurveyContext context)
         {
@@ -32,8 +32,7 @@ namespace cduff.Survey.Business
         {
             using (IUnitOfWork unitOfWork = context.CreateUnitOfWork())
             {
-                int newAttemptLogId = 0;
-                newAttemptLogId = attemptLogRepo.Insert(attemptLog);
+                int newAttemptLogId = attemptLogRepo.Insert(attemptLog);
                 if (newAttemptLogId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert AttemptLog.", attemptLog);

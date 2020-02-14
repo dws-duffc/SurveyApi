@@ -19,11 +19,11 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class AttemptLogsController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<AttemptLogsController> logger;
-        readonly AttemptLogManager attemptLogManager;
-        readonly AssignmentManager assignmentManager;
-        readonly ContactManager contactManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<AttemptLogsController> logger;
+        private readonly AttemptLogManager attemptLogManager;
+        private readonly AssignmentManager assignmentManager;
+        private readonly ContactManager contactManager;
 
         public AttemptLogsController(ILogger<AttemptLogsController> logger, IConfiguration config,
             AttemptLogManager attemptLogManager, AssignmentManager assignmentManager,

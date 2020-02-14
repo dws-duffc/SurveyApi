@@ -21,20 +21,17 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class AssignmentsController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<AssignmentsController> logger;
-        readonly AssignmentManager assignmentManager;
-        readonly ContactManager contactManager;
-        readonly PeriodManager periodManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<AssignmentsController> logger;
+        private readonly AssignmentManager assignmentManager;
+        private readonly PeriodManager periodManager;
 
         public AssignmentsController(ILogger<AssignmentsController> logger, IConfiguration config,
-            AssignmentManager assignmentManager, ContactManager contactManager,
-            PeriodManager periodManager)
+            AssignmentManager assignmentManager, PeriodManager periodManager)
         {
             this.config = config;
             this.logger = logger;
             this.assignmentManager = assignmentManager;
-            this.contactManager = contactManager;
             this.periodManager = periodManager;
         }
 
@@ -44,17 +41,25 @@ namespace cduff.Survey.Api.Controllers
         {
             try
             {
-                IEnumerable<Assignment> results;
+                IEnumerable<Assignment> results = null;
                 ClaimsPrincipal user = HttpContext.User;
-                if (user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Role).Value == "Admin")
+                if (user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin")
                 {
                     results = assignmentManager.GetAll();
                 }
                 else
                 {
-                    int repId = Convert.ToInt32(user.Claims.FirstOrDefault(x => x.Type == "RepId").Value);
-                    int periodId = periodManager.Find(x => x.IsOpen == true).SingleOrDefault().PeriodId;
-                    results = assignmentManager.Get(null, repId, periodId);
+                    int repId = Convert.ToInt32(user.Claims.FirstOrDefault(x => x.Type == "RepId")?.Value);
+                    if (periodManager == null)
+                    {
+                        return BadRequest(config["Error:Default"]);
+                    }
+
+                    Period period = periodManager.Find(x => x.IsOpen).SingleOrDefault();
+                    if (period != null)
+                    {
+                        results = assignmentManager.Get(null, repId, period.PeriodId);
+                    }
                 }
 
                 return Ok(results);
@@ -73,8 +78,8 @@ namespace cduff.Survey.Api.Controllers
             try
             {
                 ClaimsPrincipal user = HttpContext.User;
-                if (user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Role).Value != "Admin" &&
-                    Convert.ToInt32(user.Claims.FirstOrDefault(x => x.Type == "RepId").Value) != repId)
+                if (user.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Role)?.Value != "Admin" &&
+                    Convert.ToInt32(user.Claims.FirstOrDefault(x => x.Type == "RepId")?.Value) != repId)
                 {
                     return Unauthorized();
                 }
@@ -195,7 +200,7 @@ namespace cduff.Survey.Api.Controllers
 
                 if (assignment == null)
                 {
-                    return NotFound(assignment);
+                    return NotFound(null);
                 }
 
                 assignmentManager.Delete(assignment);

@@ -19,8 +19,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class AnswerManager : IManager<Answer>
     {
-        readonly SurveyContext context;
-        readonly AnswerRepository answerRepo;
+        private readonly SurveyContext context;
+        private readonly AnswerRepository answerRepo;
 
         public AnswerManager(SurveyContext context)
         {
@@ -44,8 +44,7 @@ namespace cduff.Survey.Business
                     throw new ArgumentException("Answer in this sort position already exists.", nameof(answer.AnswerSort));
                 }
 
-                int newAnswerId = 0;
-                newAnswerId = answerRepo.Insert(answer);
+                int newAnswerId = answerRepo.Insert(answer);
                 if (newAnswerId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Answer.", answer);

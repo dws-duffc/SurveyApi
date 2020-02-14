@@ -7,18 +7,16 @@
 namespace cduff.Survey.Data.Repositories
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Data;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Utilities;
 
     public abstract class Repository<TEntity> where TEntity : class
     {
-        protected const int timeOut = 30, extendedTimeout = 150;
-        SurveyContext context;
+        protected const int TimeOut = 30, ExtendedTimeout = 150;
+        private SurveyContext context;
 
         protected Repository(SurveyContext context)
         {
@@ -41,7 +39,7 @@ namespace cduff.Survey.Data.Repositories
         protected static object MapEntity(Type type, IDataRecord record, bool mapRecursive = false)
         {
             object obj = Activator.CreateInstance(type);
-            foreach (var prop in type.GetRuntimeProperties())
+            foreach (PropertyInfo prop in type.GetRuntimeProperties())
             {
                 object value;
                 Type propType = prop.PropertyType;
@@ -50,14 +48,14 @@ namespace cduff.Survey.Data.Repositories
                     value = record[prop.Name];
 
                     //set property accordingly
-                    if (canChangeType(value, propType))
+                    if (CanChangeType(value, propType))
                     {
                         prop.SetValue(obj, Convert.ChangeType(value, propType), null);
                     }
                 }
                 else if (propType.Namespace != "System" && propType.GetTypeInfo().GetInterface("IEnumerable") == null && mapRecursive)
                 {
-                    value = MapEntity(propType, record, mapRecursive);
+                    value = MapEntity(propType, record, true);
                     prop.SetValue(obj, Convert.ChangeType(value, propType), null);
                 }
             }
@@ -71,12 +69,12 @@ namespace cduff.Survey.Data.Repositories
             {
                 while (reader.Read())
                 {
-                    yield return (TEntity)MapEntity(typeof(TEntity), reader, false);
+                    yield return (TEntity)MapEntity(typeof(TEntity), reader);
                 }
             }
         }
 
-        static bool canChangeType(object value, Type convertType)
+        private static bool CanChangeType(object value, Type convertType)
         {
             if (convertType == null)
             {

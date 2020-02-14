@@ -19,9 +19,9 @@ namespace cduff.Survey.Data.Utilities
      /// </summary>
     public static class ExpressionBuilder
     {
-        static MethodInfo containsMethod = typeof(string).GetMethod("Contains");
-        static MethodInfo startsWithMethod = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
-        static MethodInfo endsWithMethod = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
+        private static readonly MethodInfo ContainsMethod = typeof(string).GetMethod("Contains");
+        private static readonly MethodInfo StartsWithMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
+        private static readonly MethodInfo EndsWithMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
 
         public static Expression<Func<T, bool>> GetExpression<T>(IList<Filter> filters)
         {
@@ -32,9 +32,9 @@ namespace cduff.Survey.Data.Utilities
             Expression exp = null;
 
             if (filters.Count == 1)
-            { exp = getExpression(param, filters[0]); }
+            { exp = GetExpression(param, filters[0]); }
             else if (filters.Count == 2)
-            { exp = getExpression(param, filters[0], filters[1]); }
+            { exp = GetExpression(param, filters[0], filters[1]); }
             else
             {
                 while (filters.Count > 0)
@@ -43,25 +43,25 @@ namespace cduff.Survey.Data.Utilities
                     Filter f2 = filters[1];
 
                     if (exp == null)
-                    { exp = getExpression(param, filters[0], filters[1]); }
+                    { exp = GetExpression(param, filters[0], filters[1]); }
                     else
-                    { exp = Expression.AndAlso(exp, getExpression(param, filters[0], filters[1])); }
+                    { exp = Expression.AndAlso(exp, GetExpression(param, filters[0], filters[1])); }
 
                     filters.Remove(f1);
                     filters.Remove(f2);
 
                     if (filters.Count == 1)
                     {
-                        exp = Expression.AndAlso(exp, getExpression(param, filters[0]));
+                        exp = Expression.AndAlso(exp, GetExpression(param, filters[0]));
                         filters.RemoveAt(0);
                     }
                 }
             }
 
-            return Expression.Lambda<Func<T, bool>>(exp, param);
+            return Expression.Lambda<Func<T, bool>>(exp ?? throw new InvalidOperationException(), param);
         }
 
-        static Expression getExpression(ParameterExpression param, Filter filter)
+        private static Expression GetExpression(ParameterExpression param, Filter filter)
         {
             MemberExpression member = Expression.Property(param, filter.PropertyName);
             ConstantExpression constant = Expression.Constant(filter.Value);
@@ -84,22 +84,22 @@ namespace cduff.Survey.Data.Utilities
                     return Expression.LessThanOrEqual(member, constant);
 
                 case Operation.Contains:
-                    return Expression.Call(member, containsMethod, constant);
+                    return Expression.Call(member, ContainsMethod, constant);
 
                 case Operation.StartsWith:
-                    return Expression.Call(member, startsWithMethod, constant);
+                    return Expression.Call(member, StartsWithMethod, constant);
 
                 case Operation.EndsWith:
-                    return Expression.Call(member, endsWithMethod, constant);
+                    return Expression.Call(member, EndsWithMethod, constant);
             }
 
             return null;
         }
 
-        static BinaryExpression getExpression (ParameterExpression param, Filter filter1, Filter filter2)
+        private static BinaryExpression GetExpression (ParameterExpression param, Filter filter1, Filter filter2)
         {
-            Expression bin1 = getExpression(param, filter1);
-            Expression bin2 = getExpression(param, filter2);
+            Expression bin1 = GetExpression(param, filter1);
+            Expression bin2 = GetExpression(param, filter2);
 
             return Expression.AndAlso(bin1, bin2);
         }

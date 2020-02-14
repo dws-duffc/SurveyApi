@@ -6,23 +6,20 @@
 
 namespace cduff.Survey.Data
 {
-    using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.Common;
-    using System.Data.SqlClient;
-    using System.Reflection;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
 
     public class ConnectionFactory : IConnectionFactory
     {
-        const string CONNECTION_NAME = "DefaultConnection:ConnectionString";
-        readonly string connectionString;
-        readonly SqlClientFactory provider;
+        private const string ConnectionName = "DefaultConnection:ConnectionString";
+        private readonly string connectionString;
+        private readonly SqlClientFactory provider;
 
         public ConnectionFactory(IConfiguration config)
         {
-            connectionString = config[CONNECTION_NAME];
+            connectionString = config[ConnectionName];
             provider = SqlClientFactory.Instance;
         }
 
@@ -31,7 +28,8 @@ namespace cduff.Survey.Data
             IDbConnection connection = provider.CreateConnection();
             if (connection == null)
             {
-                throw new KeyNotFoundException(string.Format("Failed to create a connection using the connection string named '{0}' in Data/web.config.", nameof(connectionString)));
+                throw new KeyNotFoundException(
+                    $"Failed to create a connection using the connection string named '{nameof(connectionString)}' in Data/web.config.");
             }
 
             connection.ConnectionString = connectionString;

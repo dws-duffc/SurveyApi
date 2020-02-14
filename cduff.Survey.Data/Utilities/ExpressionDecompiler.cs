@@ -24,15 +24,15 @@ namespace cduff.Survey.Data.Utilities
         /// <returns>List of type Filter.</returns>
         public static List<Filter> Decompile(Expression<Func<TEntity, bool>> expression)
         {
-            BinaryExpression convertedExp = expression.Body as BinaryExpression;
+            var convertedExp = expression.Body as BinaryExpression;
 
             if (convertedExp == null)
             {
                 throw new NotSupportedException("ExpressionDecompiler only supports BinaryExpressions.");
             }
 
-            List<Filter> filters = new List<Filter>();
-            parseExpression(convertedExp, ref filters);
+            var filters = new List<Filter>();
+            ParseExpression(convertedExp, ref filters);
 
             return filters;
         }
@@ -42,7 +42,7 @@ namespace cduff.Survey.Data.Utilities
         /// </summary>
         /// <param name="expression">Expression to be traversed.</param>
         /// <param name="filters">List to which filters are added when end of traversal is reached.</param>
-        static void parseExpression(Expression expression, ref List<Filter> filters)
+        private static void ParseExpression(Expression expression, ref List<Filter> filters)
         {
             if (expression is BinaryExpression)
             {
@@ -51,8 +51,8 @@ namespace cduff.Survey.Data.Utilities
                     && expression.NodeType != ExpressionType.MemberAccess)
                 { throw new NotSupportedException("ExpressionDecompiler only supports && and == operators."); }
 
-                BinaryExpression binExp = expression as BinaryExpression;
-                Filter filter = new Filter();
+                var binExp = expression as BinaryExpression;
+                var filter = new Filter();
 
                 if (binExp.Left is MemberExpression)
                 {
@@ -75,13 +75,13 @@ namespace cduff.Survey.Data.Utilities
                 if (filter.PropertyName != null && filter.Value != null)
                 {
                     string opChar = string.Empty;
-                    filter.Operation = getOperation(binExp.NodeType, ref opChar);
+                    filter.Operation = GetOperation(binExp.NodeType, ref opChar);
                     filter.OpChar = opChar;
                     filters.Add(filter);
                 }
 
-                parseExpression(binExp.Left, ref filters);
-                parseExpression(binExp.Right, ref filters);
+                ParseExpression(binExp.Left, ref filters);
+                ParseExpression(binExp.Right, ref filters);
             }
         }
 
@@ -90,7 +90,7 @@ namespace cduff.Survey.Data.Utilities
         /// </summary>
         /// <param name="nodeType">ExpressionType from lambda.</param>
         /// <returns>Operation enum equivalent of give ExpressionType</returns>
-        static Operation getOperation(ExpressionType nodeType, ref string opChar)
+        private static Operation GetOperation(ExpressionType nodeType, ref string opChar)
         {
             switch (nodeType)
             {

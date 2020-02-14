@@ -18,8 +18,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class RepManager : IManager<Rep>
     {
-        readonly SurveyContext context;
-        readonly RepRepository repRepo;
+        private readonly SurveyContext context;
+        private readonly RepRepository repRepo;
 
         public RepManager(SurveyContext context)
         {
@@ -31,8 +31,7 @@ namespace cduff.Survey.Business
         {
             using (IUnitOfWork unitOfWork = context.CreateUnitOfWork())
             {
-                int newRepId = 0;
-                newRepId = repRepo.Insert(rep);
+                int newRepId = repRepo.Insert(rep);
                 if (newRepId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Rep.", rep);

@@ -11,7 +11,7 @@ namespace cduff.Survey.Data.Repositories
     using System.Linq;
     using System.Linq.Expressions;
     using System.Data;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using Model;
     using Utilities;
 
@@ -30,7 +30,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Contact_Delete";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_ContactId", SqlDbType.BigInt, 19) { Value = entity.ContactId });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
@@ -50,22 +50,22 @@ namespace cduff.Survey.Data.Repositories
         public override IEnumerable<Contact> Find(Expression<Func<Contact, bool>> predicate)
         {
             List<Filter> filters = ExpressionDecompiler<Contact>.Decompile(predicate);
-            var firstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
-            var middleName = filters.SingleOrDefault(x => x.PropertyName == "MiddleName");
-            var lastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
-            var phoneNumber = filters.SingleOrDefault(x => x.PropertyName == "PhoneNumber");
-            var repNotes = filters.SingleOrDefault(x => x.PropertyName == "RepNotes");
-            var isPrimary = filters.SingleOrDefault(x => x.PropertyName == "IsPrimary");
-            var agentId = filters.SingleOrDefault(x => x.PropertyName == "AgentId");
-            var agentCode = filters.SingleOrDefault(x => x.PropertyName == "AgencyCode");
-            var agentName = filters.SingleOrDefault(x => x.PropertyName == "AgencyName");
-            var activeAgent = filters.SingleOrDefault(x => x.PropertyName == "IsActiveAgent");
+            Filter firstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
+            Filter middleName = filters.SingleOrDefault(x => x.PropertyName == "MiddleName");
+            Filter lastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
+            Filter phoneNumber = filters.SingleOrDefault(x => x.PropertyName == "PhoneNumber");
+            Filter repNotes = filters.SingleOrDefault(x => x.PropertyName == "RepNotes");
+            Filter isPrimary = filters.SingleOrDefault(x => x.PropertyName == "IsPrimary");
+            Filter agentId = filters.SingleOrDefault(x => x.PropertyName == "AgentId");
+            Filter agentCode = filters.SingleOrDefault(x => x.PropertyName == "AgencyCode");
+            Filter agentName = filters.SingleOrDefault(x => x.PropertyName == "AgencyName");
+            Filter activeAgent = filters.SingleOrDefault(x => x.PropertyName == "IsActiveAgent");
 
             using (IDbCommand command = Context.CreateCommand())
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Contact_Search";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_FirstName", SqlDbType.NVarChar, 202) { Value = firstName == null ? DBNull.Value : firstName.Value });
                 command.Parameters.Add(new SqlParameter("@p_MiddleName", SqlDbType.NVarChar, 202) { Value = middleName == null ? DBNull.Value : middleName.Value });
@@ -98,7 +98,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Contact_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_ContactId", SqlDbType.BigInt, 19) { Value = DBNull.Value });
 
@@ -123,16 +123,16 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Contact_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_ContactId", SqlDbType.BigInt, 19) { Value = id.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_ContactId", SqlDbType.BigInt, 19) { Value = id.ToDbNull() });
 
                 using (IDataReader reader = command.ExecuteReader())
                 {
                     IList<Contact> contacts = new List<Contact>();
                     while (reader.Read())
                     {
-                        Contact contact = MapEntity(typeof(Contact), reader, true) as Contact;
+                        var contact = MapEntity(typeof(Contact), reader, true) as Contact;
                         contacts.Add(contact);
                     }
 
@@ -152,15 +152,15 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Contact_Insert";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId });
-                command.Parameters.Add(new SqlParameter("@p_FirstName", SqlDbType.NVarChar, 200) { Value = entity.FirstName.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_MiddleName", SqlDbType.NVarChar, 200) { Value = entity.MiddleName.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_LastName", SqlDbType.NVarChar, 200) { Value = entity.LastName.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_PhoneNumber", SqlDbType.NVarChar, 200) { Value = entity.PhoneNumber.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_RepNotes", SqlDbType.NVarChar, 2000) { Value = entity.RepNotes.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_IsPrimary", SqlDbType.Bit, 1) { Value = entity.IsPrimary.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_FirstName", SqlDbType.NVarChar, 200) { Value = entity.FirstName.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_MiddleName", SqlDbType.NVarChar, 200) { Value = entity.MiddleName.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_LastName", SqlDbType.NVarChar, 200) { Value = entity.LastName.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_PhoneNumber", SqlDbType.NVarChar, 200) { Value = entity.PhoneNumber.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_RepNotes", SqlDbType.NVarChar, 2000) { Value = entity.RepNotes.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_IsPrimary", SqlDbType.Bit, 1) { Value = entity.IsPrimary.ToDbNull() });
                 IDbDataParameter contactId = new SqlParameter("@p_ContactId", SqlDbType.BigInt, 19) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(contactId);
 
@@ -181,16 +181,16 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Contact_Update";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_ContactId", SqlDbType.BigInt, 19) { Value = entity.ContactId });
                 command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId });
-                command.Parameters.Add(new SqlParameter("@p_FirstName", SqlDbType.NVarChar, 200) { Value = entity.FirstName.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_MiddleName", SqlDbType.NVarChar, 200) { Value = entity.MiddleName.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_LastName", SqlDbType.NVarChar, 200) { Value = entity.LastName.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_PhoneNumber", SqlDbType.NVarChar, 200) { Value = entity.PhoneNumber.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_RepNotes", SqlDbType.NVarChar, 2000) { Value = entity.RepNotes.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_IsPrimary", SqlDbType.Bit, 1) { Value = entity.IsPrimary.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_FirstName", SqlDbType.NVarChar, 200) { Value = entity.FirstName.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_MiddleName", SqlDbType.NVarChar, 200) { Value = entity.MiddleName.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_LastName", SqlDbType.NVarChar, 200) { Value = entity.LastName.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_PhoneNumber", SqlDbType.NVarChar, 200) { Value = entity.PhoneNumber.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_RepNotes", SqlDbType.NVarChar, 2000) { Value = entity.RepNotes.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_IsPrimary", SqlDbType.Bit, 1) { Value = entity.IsPrimary.ToDbNull() });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(rowCount);
 

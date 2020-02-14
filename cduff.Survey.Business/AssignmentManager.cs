@@ -8,7 +8,6 @@ namespace cduff.Survey.Business
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using Data;
     using Data.Repositories;
@@ -19,8 +18,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class AssignmentManager
     {
-        readonly SurveyContext context;
-        readonly AssignmentRepository assignmentRepo;
+        private readonly SurveyContext context;
+        private readonly AssignmentRepository assignmentRepo;
 
         public AssignmentManager(SurveyContext context)
         {

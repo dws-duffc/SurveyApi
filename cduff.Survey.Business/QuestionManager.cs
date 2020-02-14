@@ -19,8 +19,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class QuestionManager : IManager<Question>
     {
-        readonly SurveyContext context;
-        readonly QuestionRepository questionRepo;
+        private readonly SurveyContext context;
+        private readonly QuestionRepository questionRepo;
 
         public QuestionManager(SurveyContext context)
         {
@@ -38,8 +38,7 @@ namespace cduff.Survey.Business
                     throw new ArgumentException("Question in this sort position already exists.", nameof(question.QuestionSort));
                 }
 
-                int newQuestionId = 0;
-                newQuestionId = questionRepo.Insert(question);
+                int newQuestionId = questionRepo.Insert(question);
                 if (newQuestionId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Question.", question);

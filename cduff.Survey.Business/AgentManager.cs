@@ -8,7 +8,6 @@ namespace cduff.Survey.Business
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using Data;
     using Data.Repositories;
@@ -19,8 +18,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class AgentManager : IManager<Agent>
     {
-        readonly SurveyContext context;
-        readonly AgentRepository agentRepo;
+        private readonly SurveyContext context;
+        private readonly AgentRepository agentRepo;
 
         public AgentManager(SurveyContext context)
         {
@@ -32,8 +31,7 @@ namespace cduff.Survey.Business
         {
             using (IUnitOfWork unitOfWork = context.CreateUnitOfWork())
             {
-                int newAgentId = 0;
-                newAgentId = agentRepo.Insert(agent);
+                int newAgentId = agentRepo.Insert(agent);
                 if (newAgentId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Agent.", agent);

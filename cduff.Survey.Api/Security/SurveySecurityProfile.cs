@@ -6,10 +6,8 @@
 
 namespace cduff.Survey.Api.Security
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
 
     /// <summary>
@@ -19,9 +17,9 @@ namespace cduff.Survey.Api.Security
     {
         #region Fields
 
-        SurveySecurity.User user;
-        List<SurveySecurity.Attribute> attributes;
-        readonly IConfiguration config;
+        //private SurveySecurity.User user;
+        //private List<SurveySecurity.Attribute> attributes;
+        private readonly IConfiguration config;
 
         #endregion
 
@@ -31,21 +29,21 @@ namespace cduff.Survey.Api.Security
 
             if (Environment == "DEV")
             {
-                user = new SurveySecurity.User
-                {
-                    UserName = "codduff",
-                    UserType = 1
-                };
+                //user = new SurveySecurity.User
+                //{
+                //    UserName = "codduff",
+                //    UserType = 1
+                //};
 
-                attributes = new List<SurveySecurity.Attribute>
-                {
-                    new SurveySecurity.Attribute {Name = "IsAdmin" }
-                    //new SurveySecurity.Attribute {Name = "CanAccess" }
-                };
+                //attributes = new List<SurveySecurity.Attribute>
+                //{
+                //    new SurveySecurity.Attribute {Name = "IsAdmin" }
+                //    //new SurveySecurity.Attribute {Name = "CanAccess" }
+                //};
             }
             else
             {
-                createSecurityProfile(username);
+                CreateSecurityProfile(username);
             }
         }
 
@@ -55,36 +53,36 @@ namespace cduff.Survey.Api.Security
         {
             get
             {
-                if (attributes.FirstOrDefault(a => a.Name.Equals("IsAdmin")) != null) { return "Admin"; }
-                if (attributes.FirstOrDefault(a => a.Name.Equals("CanAccess")) != null) { return "User"; }
+                //if (attributes.FirstOrDefault(a => a.Name.Equals("IsAdmin")) != null) { return "Admin"; }
+                //if (attributes.FirstOrDefault(a => a.Name.Equals("CanAccess")) != null) { return "User"; }
                 return "NotAuthorized";
             }
         }
 
-        public string UserName => user.UserName;
+        public string UserName => "cduff"; // user.UserName;
 
-        public int UserType => user.UserType;
+        public int UserType => 1; // user.UserType;
 
-        string ApplicationName => config["ApplicationName"] ?? "SurveyApi";
+        private string ApplicationName => config["ApplicationName"] ?? "SurveyApi";
 
-        string Environment => config[".SurveySecurity.Environment.Short"] ?? "DEV";
+        private string Environment => config[".SurveySecurity.Environment.Short"] ?? "DEV";
 
         #endregion
 
-        void createSecurityProfile(string username)
+        private void CreateSecurityProfile(string username)
         {
-            // connect to service
-            SurveySecurity.SecurityInfoWCFServiceClient securityService = new SurveySecurity.SecurityInfoWCFServiceClient();
+            //// connect to service
+            //var securityService = new SurveySecurity.SecurityInfoWCFServiceClient();
 
-            // get user
-            user = securityService.GetUserInfoAsync(username, Environment).Result;
+            //// get user
+            //user = securityService.GetUserInfoAsync(username, Environment).Result;
 
-            // get attributes
-            attributes = new List<SurveySecurity.Attribute>(
-                securityService.GetAttributeInfoAsync(ApplicationName, UserName, Environment).Result);
+            //// get attributes
+            //attributes = new List<SurveySecurity.Attribute>(
+            //    securityService.GetAttributeInfoAsync(ApplicationName, UserName, Environment).Result);
 
-            // close service
-            securityService.CloseAsync();
+            //// close service
+            //securityService.CloseAsync();
         }
     }
 }

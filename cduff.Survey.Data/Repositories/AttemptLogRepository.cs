@@ -11,7 +11,7 @@ namespace cduff.Survey.Data.Repositories
     using System.Linq;
     using System.Linq.Expressions;
     using System.Data;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using Model;
     using Utilities;
 
@@ -35,25 +35,25 @@ namespace cduff.Survey.Data.Repositories
         public override IEnumerable<AttemptLog> Find(Expression<Func<AttemptLog, bool>> predicate)
         {
             List<Filter> filters = ExpressionDecompiler<AttemptLog>.Decompile(predicate);
-            var periodId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
-            var periodIsOpen = filters.SingleOrDefault(x => x.PropertyName == "IsOpen");
-            var agentId = filters.SingleOrDefault(x => x.PropertyName == "AgentId");
-            var agentCode = filters.SingleOrDefault(x => x.PropertyName == "AgencyCode");
-            var agentName = filters.SingleOrDefault(x => x.PropertyName == "AgencyName");
-            var activeAgent = filters.SingleOrDefault(x => x.PropertyName == "IsActiveAgent");
-            var repId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
-            var repUsername = filters.SingleOrDefault(x => x.PropertyName == "RepId");
-            var repFirstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
-            var repLastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
-            var repIsActive = filters.SingleOrDefault(x => x.PropertyName == "IsActive");
-            var attemptedDate = filters.SingleOrDefault(x => x.PropertyName == "AttemptedDate");
-            var attemptedBy = filters.SingleOrDefault(x => x.PropertyName == "AttemptedBy");
+            Filter periodId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
+            Filter periodIsOpen = filters.SingleOrDefault(x => x.PropertyName == "IsOpen");
+            Filter agentId = filters.SingleOrDefault(x => x.PropertyName == "AgentId");
+            Filter agentCode = filters.SingleOrDefault(x => x.PropertyName == "AgencyCode");
+            Filter agentName = filters.SingleOrDefault(x => x.PropertyName == "AgencyName");
+            Filter activeAgent = filters.SingleOrDefault(x => x.PropertyName == "IsActiveAgent");
+            Filter repId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
+            Filter repUsername = filters.SingleOrDefault(x => x.PropertyName == "RepId");
+            Filter repFirstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
+            Filter repLastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
+            Filter repIsActive = filters.SingleOrDefault(x => x.PropertyName == "IsActive");
+            Filter attemptedDate = filters.SingleOrDefault(x => x.PropertyName == "AttemptedDate");
+            Filter attemptedBy = filters.SingleOrDefault(x => x.PropertyName == "AttemptedBy");
 
             using (IDbCommand command = Context.CreateCommand())
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_AttemptLog_Search";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = periodId == null ? DBNull.Value : periodId.Value });
                 command.Parameters.Add(new SqlParameter("@p_PeriodIsOpen", SqlDbType.Bit, 1) { Value = periodIsOpen == null ? DBNull.Value : periodIsOpen.Value });
@@ -89,7 +89,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_AttemptLog_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_AttemptLogId", SqlDbType.Int, 10) { Value = DBNull.Value });
 
@@ -114,16 +114,16 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_AttemptLog_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_AttemptLogId", SqlDbType.BigInt, 19) { Value = id.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_AttemptLogId", SqlDbType.BigInt, 19) { Value = id.ToDbNull() });
 
                 using (IDataReader reader = command.ExecuteReader())
                 {
                     IList<AttemptLog> attemptLogs = new List<AttemptLog>();
                     while (reader.Read())
                     {
-                        AttemptLog attemptLog = MapEntity(typeof(AttemptLog), reader, true) as AttemptLog;
+                        var attemptLog = MapEntity(typeof(AttemptLog), reader, true) as AttemptLog;
                         attemptLogs.Add(attemptLog);
                     }
 
@@ -143,7 +143,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_AttemptLog_Insert";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = entity.PeriodId });
                 command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId });

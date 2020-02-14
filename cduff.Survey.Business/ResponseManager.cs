@@ -8,7 +8,6 @@ namespace cduff.Survey.Business
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using Data;
     using Data.Repositories;
@@ -19,8 +18,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class ResponseManager : IManager<Response>
     {
-        readonly SurveyContext context;
-        readonly ResponseRepository responseRepo;
+        private readonly SurveyContext context;
+        private readonly ResponseRepository responseRepo;
 
         public ResponseManager(SurveyContext context)
         {
@@ -38,8 +37,7 @@ namespace cduff.Survey.Business
                         nameof(response.ResponseId), response.ResponseId, "QuestionId must be greater than 0.");
                 }
 
-                int newResponseId = 0;
-                newResponseId = responseRepo.Insert(response);
+                int newResponseId = responseRepo.Insert(response);
                 if (newResponseId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Response.", response);

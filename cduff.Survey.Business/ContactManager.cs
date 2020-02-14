@@ -19,8 +19,8 @@ namespace cduff.Survey.Business
     /// </summary>
     public class ContactManager : IManager<Contact>
     {
-        readonly SurveyContext context;
-        readonly ContactRepository contactRepo;
+        private readonly SurveyContext context;
+        private readonly ContactRepository contactRepo;
 
         public ContactManager(SurveyContext context)
         {
@@ -32,10 +32,10 @@ namespace cduff.Survey.Business
         {
             using (IUnitOfWork unitOfWork = context.CreateUnitOfWork())
             {
-                if (contact.IsPrimary == true)
+                if (contact.IsPrimary)
                 {
-                    var oldPrimaryContact = contactRepo
-                        .Find(x => x.AgentId == contact.AgentId && x.IsPrimary == true)
+                    Contact oldPrimaryContact = contactRepo
+                        .Find(x => x.AgentId == contact.AgentId && x.IsPrimary)
                         .SingleOrDefault();
 
                     if (oldPrimaryContact != null)
@@ -48,8 +48,7 @@ namespace cduff.Survey.Business
                     }
                 }
 
-                int newContactId = 0;
-                newContactId = contactRepo.Insert(contact);
+                int newContactId = contactRepo.Insert(contact);
                 if (newContactId <= 0)
                 {
                     throw new FailedOperationException("Failed to insert Contact.", contact);
@@ -99,10 +98,10 @@ namespace cduff.Survey.Business
         {
             using (IUnitOfWork unitOfWork = context.CreateUnitOfWork())
             {
-                if (contact.IsPrimary == true)
+                if (contact.IsPrimary)
                 {
-                    var oldPrimaryContact = contactRepo
-                        .Find(x => x.AgentId == contact.AgentId && x.IsPrimary == true)
+                    Contact oldPrimaryContact = contactRepo
+                        .Find(x => x.AgentId == contact.AgentId && x.IsPrimary)
                         .SingleOrDefault();
 
                     if (oldPrimaryContact != null)

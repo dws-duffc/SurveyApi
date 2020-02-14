@@ -11,8 +11,8 @@ namespace cduff.Survey.Data
 
     public class SurveyUnitOfWork : IUnitOfWork
     {
-        readonly Action<SurveyUnitOfWork> rolledBack;
-        readonly Action<SurveyUnitOfWork> committed;
+        private readonly Action<SurveyUnitOfWork> rolledBack;
+        private readonly Action<SurveyUnitOfWork> committed;
         private IDbTransaction transaction;
 
         public SurveyUnitOfWork(IDbTransaction transaction, Action<SurveyUnitOfWork> rolledBack, Action<SurveyUnitOfWork> committed)

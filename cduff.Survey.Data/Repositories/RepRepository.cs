@@ -11,7 +11,7 @@ namespace cduff.Survey.Data.Repositories
     using System.Linq;
     using System.Linq.Expressions;
     using System.Data;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using Model;
     using Utilities;
 
@@ -30,7 +30,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Rep_Delete";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = entity.RepId });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
@@ -50,16 +50,16 @@ namespace cduff.Survey.Data.Repositories
         public override IEnumerable<Rep> Find(Expression<Func<Rep, bool>> predicate)
         {
             List<Filter> filters = ExpressionDecompiler<Rep>.Decompile(predicate);
-            var username = filters.SingleOrDefault(x => x.PropertyName == "Username");
-            var firstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
-            var lastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
-            var isActive = filters.SingleOrDefault(x => x.PropertyName == "IsActive");
+            Filter username = filters.SingleOrDefault(x => x.PropertyName == "Username");
+            Filter firstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
+            Filter lastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
+            Filter isActive = filters.SingleOrDefault(x => x.PropertyName == "IsActive");
 
             using (IDbCommand command = Context.CreateCommand())
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Rep_Search";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_Username", SqlDbType.VarChar, 202) { Value = username == null ? DBNull.Value : username.Value });
                 command.Parameters.Add(new SqlParameter("@p_FirstName", SqlDbType.VarChar, 12) { Value = firstName == null ? DBNull.Value : firstName.Value });
@@ -86,7 +86,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Rep_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = DBNull.Value });
 
@@ -111,16 +111,16 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Rep_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = id.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = id.ToDbNull() });
 
                 using (IDataReader reader = command.ExecuteReader())
                 {
                     IList<Rep> reps = new List<Rep>();
                     while (reader.Read())
                     {
-                        Rep rep = MapEntity(typeof(Rep), reader, true) as Rep;
+                        var rep = MapEntity(typeof(Rep), reader, true) as Rep;
                         reps.Add(rep);
                     }
 
@@ -140,10 +140,10 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Rep_Insert";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_Username", SqlDbType.VarChar, 200) { Value = entity.Username.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_IsActive", SqlDbType.Bit, 1) { Value = entity.IsActive.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_Username", SqlDbType.VarChar, 200) { Value = entity.Username.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_IsActive", SqlDbType.Bit, 1) { Value = entity.IsActive.ToDbNull() });
                 IDbDataParameter repId = new SqlParameter("@p_RepId", SqlDbType.BigInt, 19) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(repId);
 
@@ -164,11 +164,11 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Rep_Update";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = entity.RepId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_Username", SqlDbType.VarChar, 200) { Value = entity.Username.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_IsActive", SqlDbType.Bit, 1) { Value = entity.IsActive.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = entity.RepId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_Username", SqlDbType.VarChar, 200) { Value = entity.Username.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_IsActive", SqlDbType.Bit, 1) { Value = entity.IsActive.ToDbNull() });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(rowCount);
 

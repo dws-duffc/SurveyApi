@@ -18,9 +18,9 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class ContactsController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<ContactsController> logger;
-        readonly ContactManager contactManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<ContactsController> logger;
+        private readonly ContactManager contactManager;
 
         public ContactsController(ILogger<ContactsController> logger, IConfiguration config,
             ContactManager contactManager)

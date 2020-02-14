@@ -13,10 +13,10 @@ namespace cduff.Survey.Data
 
     public class SurveyContext : IDisposable
     {
-        readonly IDbConnection connection;
-        readonly IConnectionFactory connectionFactory;
-        readonly ReaderWriterLockSlim readWriteLock = new ReaderWriterLockSlim();
-        readonly LinkedList<SurveyUnitOfWork> workList = new LinkedList<SurveyUnitOfWork>();
+        private readonly IDbConnection connection;
+        private readonly IConnectionFactory connectionFactory;
+        private readonly ReaderWriterLockSlim readWriteLock = new ReaderWriterLockSlim();
+        private readonly LinkedList<SurveyUnitOfWork> workList = new LinkedList<SurveyUnitOfWork>();
 
         public SurveyContext(IConnectionFactory connectionFactory)
         {
@@ -52,7 +52,7 @@ namespace cduff.Survey.Data
             }
 
             IDbTransaction transaction = connection.BeginTransaction();
-            SurveyUnitOfWork unitOfWork = new SurveyUnitOfWork(transaction, RemoveTransaction, RemoveTransaction);
+            var unitOfWork = new SurveyUnitOfWork(transaction, RemoveTransaction, RemoveTransaction);
 
             readWriteLock.EnterWriteLock();
             workList.AddLast(unitOfWork);
@@ -61,7 +61,7 @@ namespace cduff.Survey.Data
             return unitOfWork;
         }
 
-        void RemoveTransaction(SurveyUnitOfWork unitOfWork)
+        private void RemoveTransaction(SurveyUnitOfWork unitOfWork)
         {
             readWriteLock.EnterWriteLock();
             workList.Remove(unitOfWork);
@@ -70,7 +70,7 @@ namespace cduff.Survey.Data
 
         #region Dispose
 
-        bool disposed;
+        private bool disposed;
 
         public void Dispose()
         {

@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Hosting;
-
-namespace cduff.Survey.Api.Controllers
+﻿namespace cduff.Survey.Api.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -10,11 +7,14 @@ namespace cduff.Survey.Api.Controllers
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http.Authentication;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.Extensions.Hosting;
     using Security;
     using Business;
+    using Model;
 
     /// <summary>
     /// Logs in a user, creates an encrypted user cookie, and redirects
@@ -23,9 +23,9 @@ namespace cduff.Survey.Api.Controllers
     [AllowAnonymous]
     public class AccountsController : Controller
     {
-        readonly IWebHostEnvironment env;
-        readonly IConfiguration config;
-        readonly RepManager repManager;
+        private readonly IWebHostEnvironment env;
+        private readonly IConfiguration config;
+        private readonly RepManager repManager;
 
         public AccountsController(IWebHostEnvironment env, IConfiguration config,
             RepManager repManager)
@@ -40,39 +40,34 @@ namespace cduff.Survey.Api.Controllers
         {
             SurveySecurityProfile securityProfile = LogIn().Result;
 
-            if (securityProfile == null)
-            {
-                return Redirect("~/Home/Unauthorized/");
-            }
-
-            return Redirect(returnUrl);
+            return Redirect(securityProfile == null ? "~/Home/Unauthorized/" : returnUrl);
         }
 
-        async Task<SurveySecurityProfile> LogIn()
+        private async Task<SurveySecurityProfile> LogIn()
         {
-            SurveySecurityProfile securityProfile = new SurveySecurityProfile(UserName, config);
+            var securityProfile = new SurveySecurityProfile(UserName, config);
 
             if (securityProfile.Role == "NotAuthorized")
             {
                 return null;
             }
 
-            string Issuer = Environment.GetEnvironmentVariable("Domain");
+            string issuer = Environment.GetEnvironmentVariable("Domain");
 
-            int repId = repManager.Find(x => x.Username == securityProfile.UserName).SingleOrDefault().RepId;
+            Rep rep = repManager.Find(x => x.Username == securityProfile.UserName).SingleOrDefault();
 
             var claims = new List<Claim> {
-                        new Claim("Username", securityProfile.UserName, ClaimValueTypes.String, Issuer),
-                        new Claim(ClaimTypes.Role, securityProfile.Role, ClaimValueTypes.String, Issuer),
-                        new Claim("RepId", Convert.ToString(repId), ClaimValueTypes.Integer),
+                        new Claim("Username", securityProfile.UserName, ClaimValueTypes.String, issuer),
+                        new Claim(ClaimTypes.Role, securityProfile.Role, ClaimValueTypes.String, issuer),
+                        new Claim("RepId", Convert.ToString(rep?.RepId ?? 0), ClaimValueTypes.Integer),
                         new Claim("UserType", Convert.ToString(securityProfile.UserType), ClaimValueTypes.Integer)
                     };
 
-            var userIdentity = new ClaimsIdentity(claims, "SuperSecureLogin");
+            var claimsIdentity = new ClaimsIdentity(claims, "SuperSecureLogin");
 
-            var userPrincipal = new ClaimsPrincipal(userIdentity);
-
-            await HttpContext.Authentication.SignInAsync("SurveyAuthentication", userPrincipal,
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
                 new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
@@ -83,7 +78,7 @@ namespace cduff.Survey.Api.Controllers
             return securityProfile;
         }
 
-        string UserName
+        private string UserName
         {
             get
             {
@@ -91,7 +86,9 @@ namespace cduff.Survey.Api.Controllers
                 try
                 {
                     if (Request.Cookies["UserName"] != null)
+                    {
                         rtnValue = Request.Cookies["UserName"];
+                    }
                 }
                 catch
                 {
@@ -100,7 +97,9 @@ namespace cduff.Survey.Api.Controllers
 
                 //remove if causing security issues
                 if (env.IsDevelopment())
-                    rtnValue = "codduff";
+                {
+                    rtnValue = "cduff";
+                }
 
                 return rtnValue;
             }

@@ -9,7 +9,7 @@ namespace cduff.Survey.Data.Repositories
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.SqlClient;
+    using Microsoft.Data.SqlClient;
     using System.Linq;
     using Model;
     using Utilities;
@@ -30,7 +30,7 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Assignment_Delete";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = entity.PeriodId });
                 command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId });
@@ -52,29 +52,29 @@ namespace cduff.Survey.Data.Repositories
         public override IEnumerable<Assignment> Find(Expression<Func<Assignment, bool>> predicate)
         {
             List<Filter> filters = ExpressionDecompiler<Assignment>.Decompile(predicate);
-            var periodId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
-            var periodStartDate = filters.SingleOrDefault(x => x.PropertyName == "StartDate");
-            var periodEndDate = filters.SingleOrDefault(x => x.PropertyName == "EndDate");
-            var periodIsOpen = filters.SingleOrDefault(x => x.PropertyName == "IsOpen");
-            var agentId = filters.SingleOrDefault(x => x.PropertyName == "AgentId");
-            var agentCode = filters.SingleOrDefault(x => x.PropertyName == "AgencyCode");
-            var agentName = filters.SingleOrDefault(x => x.PropertyName == "AgencyName");
-            var activeAgent = filters.SingleOrDefault(x => x.PropertyName == "IsActiveAgent");
-            var repId = filters.SingleOrDefault(x => x.PropertyName == "RepId");
-            var repUsername = filters.SingleOrDefault(x => x.PropertyName == "Username");
-            var repFirstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
-            var repLastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
-            var repIsActive = filters.SingleOrDefault(x => x.PropertyName == "IsActive");
-            var status = filters.SingleOrDefault(x => x.PropertyName == "Status");
-            var attemptedBy = filters.SingleOrDefault(x => x.PropertyName == "LastAttemptedBy");
-            var attemptDate = filters.SingleOrDefault(x => x.PropertyName == "LastAttemptedDate");
-            var notes = filters.SingleOrDefault(x => x.PropertyName == "Notes");
+            Filter periodId = filters.SingleOrDefault(x => x.PropertyName == "PeriodId");
+            Filter periodStartDate = filters.SingleOrDefault(x => x.PropertyName == "StartDate");
+            Filter periodEndDate = filters.SingleOrDefault(x => x.PropertyName == "EndDate");
+            Filter periodIsOpen = filters.SingleOrDefault(x => x.PropertyName == "IsOpen");
+            Filter agentId = filters.SingleOrDefault(x => x.PropertyName == "AgentId");
+            Filter agentCode = filters.SingleOrDefault(x => x.PropertyName == "AgencyCode");
+            Filter agentName = filters.SingleOrDefault(x => x.PropertyName == "AgencyName");
+            Filter activeAgent = filters.SingleOrDefault(x => x.PropertyName == "IsActiveAgent");
+            Filter repId = filters.SingleOrDefault(x => x.PropertyName == "RepId");
+            Filter repUsername = filters.SingleOrDefault(x => x.PropertyName == "Username");
+            Filter repFirstName = filters.SingleOrDefault(x => x.PropertyName == "FirstName");
+            Filter repLastName = filters.SingleOrDefault(x => x.PropertyName == "LastName");
+            Filter repIsActive = filters.SingleOrDefault(x => x.PropertyName == "IsActive");
+            Filter status = filters.SingleOrDefault(x => x.PropertyName == "Status");
+            Filter attemptedBy = filters.SingleOrDefault(x => x.PropertyName == "LastAttemptedBy");
+            Filter attemptDate = filters.SingleOrDefault(x => x.PropertyName == "LastAttemptedDate");
+            Filter notes = filters.SingleOrDefault(x => x.PropertyName == "Notes");
 
             using (IDbCommand command = Context.CreateCommand())
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Assignment_Search";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = periodId == null ? DBNull.Value : periodId.Value });
                 command.Parameters.Add(new SqlParameter("@p_PeriodStartDate", SqlDbType.DateTime) { Value = periodStartDate == null ? DBNull.Value : Convert.ToDateTime(periodStartDate.Value).ToValidRange() });
@@ -117,11 +117,11 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Assignment_Get";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = agentId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = repId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = periodId.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = agentId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = repId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = periodId.ToDbNull() });
 
                 using (IDataReader reader = command.ExecuteReader())
                 {
@@ -162,14 +162,14 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Assignment_Insert";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
                 command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = entity.PeriodId });
                 command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId });
                 command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = entity.RepId });
-                command.Parameters.Add(new SqlParameter("@p_Status", SqlDbType.VarChar, 200) { Value = entity.Status.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_Notes", SqlDbType.VarChar, 8000) { Value = entity.Notes.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_LastAttemptedBy", SqlDbType.VarChar, 200) { Value = entity.LastAttemptedBy.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_Status", SqlDbType.VarChar, 200) { Value = entity.Status.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_Notes", SqlDbType.VarChar, 8000) { Value = entity.Notes.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_LastAttemptedBy", SqlDbType.VarChar, 200) { Value = entity.LastAttemptedBy.ToDbNull() });
                 command.Parameters.Add(new SqlParameter("@p_LastAttemptedDate", SqlDbType.DateTime) { Value = entity.LastAttemptedDate.ToValidRange() });
                 command.Parameters.Add(new SqlParameter("@p_AttemptCount", SqlDbType.TinyInt, 3) { Value = entity.AttemptCount });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
@@ -192,16 +192,16 @@ namespace cduff.Survey.Data.Repositories
             {
                 command.CommandType = CommandType.StoredProcedure;
                 command.CommandText = @"dbo.Survey_Assignment_Update";
-                command.CommandTimeout = timeOut;
+                command.CommandTimeout = TimeOut;
 
-                command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = entity.PeriodId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = entity.RepId.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_Status", SqlDbType.VarChar, 200) { Value = entity.Status.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_Notes", SqlDbType.VarChar, 8000) { Value = entity.Notes.ToDBNull() });
-                command.Parameters.Add(new SqlParameter("@p_LastAttemptedBy", SqlDbType.VarChar, 200) { Value = entity.LastAttemptedBy.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_PeriodId", SqlDbType.SmallInt, 5) { Value = entity.PeriodId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_AgentId", SqlDbType.Int, 10) { Value = entity.AgentId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_RepId", SqlDbType.Int, 10) { Value = entity.RepId.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_Status", SqlDbType.VarChar, 200) { Value = entity.Status.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_Notes", SqlDbType.VarChar, 8000) { Value = entity.Notes.ToDbNull() });
+                command.Parameters.Add(new SqlParameter("@p_LastAttemptedBy", SqlDbType.VarChar, 200) { Value = entity.LastAttemptedBy.ToDbNull() });
                 command.Parameters.Add(new SqlParameter("@p_LastAttemptedDate", SqlDbType.DateTime) { Value = entity.LastAttemptedDate.ToValidRange() });
-                command.Parameters.Add(new SqlParameter("@p_AttemptCount", SqlDbType.TinyInt, 3) { Value = entity.AttemptCount.ToDBNull() });
+                command.Parameters.Add(new SqlParameter("@p_AttemptCount", SqlDbType.TinyInt, 3) { Value = entity.AttemptCount.ToDbNull() });
                 IDbDataParameter rowCount = new SqlParameter("@p_RowCount", SqlDbType.Int, 10) { Direction = ParameterDirection.Output };
                 command.Parameters.Add(rowCount);
 

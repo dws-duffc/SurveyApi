@@ -7,7 +7,6 @@
 namespace cduff.Survey.Data.Utilities
 {
     using System;
-    using System.Collections.Generic;
     using System.Data;
     using System.Linq;
     using System.Reflection;
@@ -16,7 +15,7 @@ namespace cduff.Survey.Data.Utilities
     {
         public static bool HasColumn(this IDataRecord record, string columnName)
         {
-            for (int i = 0; i < record.FieldCount; i++)
+            for (var i = 0; i < record.FieldCount; i++)
             {
                 if (record.GetName(i).Equals(columnName, StringComparison.OrdinalIgnoreCase))
                 {
@@ -29,16 +28,8 @@ namespace cduff.Survey.Data.Utilities
 
         public static bool HasProperty<T>(this T record, string propName) where T : class
         {
-            var props = record.GetType().GetProperties();
-            foreach (var prop in props)
-            {
-                if (prop.Name.Equals(propName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            PropertyInfo[] props = record.GetType().GetProperties();
+            return props.Any(prop => prop.Name.Equals(propName, StringComparison.OrdinalIgnoreCase));
         }
 
         public static object ToValidRange(this DateTime date)
@@ -49,17 +40,17 @@ namespace cduff.Survey.Data.Utilities
             return DBNull.Value;
         }
 
-        public static object ToDBNull<T>(this T? value) where T : struct
+        public static object ToDbNull<T>(this T? value) where T : struct
         {
             return (object)value ?? DBNull.Value;
         }
 
-        public static object ToDBNull(this string value)
+        public static object ToDbNull(this string value)
         {
             return string.IsNullOrWhiteSpace(value) ? DBNull.Value : (object)value;
         }
 
-        public static object ToDBNull(this object value)
+        public static object ToDbNull(this object value)
         {
             return value ?? DBNull.Value;
         }

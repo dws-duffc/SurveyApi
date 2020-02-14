@@ -18,12 +18,12 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class RepsController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<RepsController> logger;
-        readonly RepManager repManager;
-        readonly AssignmentManager assignmentManager;
-        readonly AttemptLogManager attemptLogManager;
-        readonly PeriodManager periodManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<RepsController> logger;
+        private readonly RepManager repManager;
+        private readonly AssignmentManager assignmentManager;
+        private readonly AttemptLogManager attemptLogManager;
+        private readonly PeriodManager periodManager;
 
         public RepsController(ILogger<RepsController> logger, IConfiguration config,
             RepManager repManager, AssignmentManager assignmentManager,
@@ -77,10 +77,16 @@ namespace cduff.Survey.Api.Controllers
         {
             try
             {
-                var openPeriod = periodManager.Find(x => x.IsOpen == true).SingleOrDefault();
+                Period openPeriod = periodManager.Find(x => x.IsOpen).SingleOrDefault();
+                if (openPeriod == null)
+                {
+                    return BadRequest(config["Error:Default"]);
+                }
+
                 IEnumerable<Assignment> assignments = assignmentManager.Get(null, id, openPeriod.PeriodId);
 
                 return Ok(assignments);
+
             }
             catch (Exception ex)
             {

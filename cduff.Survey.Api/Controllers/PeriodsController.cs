@@ -19,12 +19,12 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class PeriodsController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<PeriodsController> logger;
-        readonly PeriodManager periodManager;
-        readonly AssignmentManager assignmentManager;
-        readonly AttemptLogManager attemptLogManager;
-        readonly QuestionManager questionManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<PeriodsController> logger;
+        private readonly PeriodManager periodManager;
+        private readonly AssignmentManager assignmentManager;
+        private readonly AttemptLogManager attemptLogManager;
+        private readonly QuestionManager questionManager;
 
         public PeriodsController(ILogger<PeriodsController> logger, IConfiguration config,
             PeriodManager periodManager, AssignmentManager assignmentManager,

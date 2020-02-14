@@ -20,9 +20,9 @@ namespace cduff.Survey.Api.Controllers
     [Route("api/[controller]")]
     public class ResponsesController : Controller
     {
-        readonly IConfiguration config;
-        readonly ILogger<ResponsesController> logger;
-        readonly ResponseManager responseManager;
+        private readonly IConfiguration config;
+        private readonly ILogger<ResponsesController> logger;
+        private readonly ResponseManager responseManager;
 
         public ResponsesController(ILogger<ResponsesController> logger, IConfiguration config,
             ResponseManager responseManager)
